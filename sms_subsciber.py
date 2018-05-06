@@ -1,7 +1,5 @@
+from twilio.rest import Client
 import paho.mqtt.client as mqtt
-#import broker
-import time
-import RPi.GPIO as GPIO
 import time
 
 def message_handler(client, userdata, message):
@@ -9,30 +7,27 @@ def message_handler(client, userdata, message):
 	print("Message topic ", message.topic)
 	print("Message QOS ", message.qos)
 	print("Message retain flag ", message.retain)
-	
 	command = str(message.payload.decode("utf-8"))
+	
 	if command == "Turn on":
-		lightsOn()
-	elif command == "Turn off":
-		lightsOff()
+		send_sms()
 
-def lightsOn():
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setwarnings(False)
-	GPIO.setup(18,GPIO.OUT)
-	print("LED on")
-	GPIO.output(18,GPIO.HIGH)
+def send_sms():
+	account_sid = "AC5b9818960edf481a6bbfcc2416ccb324"
+	auth_token = "4d1627c8154a9c14c43c38f52575861a"
+	
+	client = Client(account_sid, auth_token)
 
-def lightsOff():
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setwarnings(False)
-	GPIO.setup(18,GPIO.OUT)
-	print("LED off")
-	GPIO.output(18,GPIO.LOW)
+	message = client.messages.create(
+		to = "+17204924454",
+		from_ = "+19389999211",
+		body = "Alert - Intrusion detected at house!")
+	
+	print(message.sid)
 
 
 
-subs = mqtt.Client("subscriber-2")
+subs = mqtt.Client("subscriber-3")
 print("Connecting to broker")
 #subs.connect("127.0.0.1:1883")
 subs.connect("127.0.0.1")

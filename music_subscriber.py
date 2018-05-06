@@ -5,55 +5,57 @@ import pygame
 import os
 import psutil
 
-play_f = 0
+playf = 0
 
 class Sound:
-    def __init__(self):
-        pygame.mixer.init()
+	def __init__(self):
+		pygame.mixer.init()
 
-    def playSound(self):
-        print("Alive")
-        pygame.mixer.music.load("play.wav")
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy() == True:
-            continue
+	def playSound(self):
+		print("Alive")
+		pygame.mixer.music.load("play.wav")
+		pygame.mixer.music.play()
+		while pygame.mixer.music.get_busy() == True:
+			continue
 
-    def stopSound():
-        pygame.mixer.music.stop()
+	def stopSound():
+		pygame.mixer.music.stop()
 
 
 def play():
-    sound = Sound()
-    sound.playSound()
+	sound = Sound()
+	sound.playSound()
 
 def message_handler(client, userdata, message):
-    print("Message received ", str(message.payload.decode("utf-8")))
-    print("Message topic ", message.topic)
-    print("Message QOS ", message.qos)
-    print("Message retain flag ", message.retain)
-    print(message)
-    command = str(message.payload.decode("utf-8"))
+	print("Message received ", str(message.payload.decode("utf-8")))
+	print("Message topic ", message.topic)
+	print("Message QOS ", message.qos)
+	print("Message retain flag ", message.retain)
+	print(message)
+	command = str(message.payload.decode("utf-8"))
     
-    global playf
-    if command == "Play":
-        print("---------------------------------------")
-        if playf == 0:
-            pid = os.fork()
-            playf = 1
-            if pid == 0:
-                sound.playSound()
-        else:
-            print("Already playing")
-    elif message == "Stop":
-        if playf == 1:
-            print("Need to Stop")
-            print("Stop the existing child who is playing music")
-            playf = 0
-            curr_id = psutil.Process(os.getpid())
-            for child in curr_id.children(recursive=True):
-                child.kill()
-        else:
-            print("Not running any file. No need to stop")
+	global playf
+	if command == "Play":
+		print("---------------------------------------")
+		if playf == 0:
+			playf = 1
+			pid = os.fork()
+			if pid == 0:
+				play()
+		else:
+			print("Already playing")
+
+	elif command == "Stop":
+		print("PLAYF value ", playf)
+		if playf == 1:
+			print("Need to Stop")
+			print("Stop the existing child who is playing music")
+			playf = 0
+			curr_id = psutil.Process(os.getpid())
+			for child in curr_id.children(recursive=True):
+				child.kill()
+		else:
+			print("Not running any file. No need to stop")
        
 
 subs = mqtt.Client("subscriber-3")
