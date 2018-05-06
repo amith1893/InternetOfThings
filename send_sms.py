@@ -8,7 +8,7 @@ auth_token  = ""
 client = Client(account_sid, auth_token)
 
 message = client.messages.create(
-    to="+17204924454", 
+    to="", 
     from_="+19389999211 ",
     body="Alert - Intrusion detected at house!")
 
