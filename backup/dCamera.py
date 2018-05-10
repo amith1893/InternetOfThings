@@ -33,6 +33,8 @@ class CaptureAndSendImage:
 		response = requests.post(url, files=files)
 		if response.status_code == 200:
 			print("Image sent successfully")
+			#print(response.json())
+			return response
 		else:
 			print("Image sending failed")
 
@@ -40,19 +42,38 @@ class CaptureAndSendImage:
 
 if __name__=='__main__':
     
+	csi = CaptureAndSendImage(url)
 	while(1):
-		#csi = CaptureAndSendImage(url)
-		#csi.capture_image()
-		#csi.send_image()
 
+		
+		'''csi.capture_image()
+		imageResponse = csi.send_image()
+		imageData = imageResponse.json()
+		person = imageData['person']
+		
+		if person:	
+			authorized = imageData['authorized']
+			if authorized:
+				print("Hello "+imageData['authorized_match'])
+				publisher.publish_music("Stop")
+				publisher.publish_light("Turn off")
+			else:
+				print("Alert - House in danger")
+				publisher.publish_sms("Turn on")
+				publisher.publish_music("Play")
+				publisher.publish_light("Turn on")
+		else:
+			print("Doing nothing")
+
+'''
 		response = requests.get(pollUrl)
 		data = response.json()
 		#print(data)
 
 		light = data['light'] 
 		sound = data['music']
-		print(light)
-		print(sound)
+		#print(light)
+		#print(sound)
 		if  sound == True:
 			print("Publishing")
 			publisher.publish_music("Play")
@@ -62,6 +83,5 @@ if __name__=='__main__':
 		if  light == True:
 			publisher.publish_light("Turn on")
 		elif light == False:
-			publisher.publish_light("Turn off")
-		
-		time.sleep(3)
+			publisher.publish_light("Turn off")		
+		time.sleep(4)
